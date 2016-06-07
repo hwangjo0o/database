@@ -1,0 +1,74 @@
+Q1: 성과 이름이 ‘John B. Smith’인 사원의 생년월일과 주소를 검색하라.
+Q2: 부서번호가 5인 부서에 근무하는 모든 사원의 모든 애트리뷰트 값을 검색하라.
+Q3: ‘Research’ 부서에 근무하는 모든 사원의 성과 이름, 그리고 주소를 검색하라.
+Q4: ‘Stafford’에 위치한 모든 프로젝트에 대해서, 프로젝트 번호, 담당부서 번호, 부서관리자의 성, 주소, 생년월일을 검색하라.
+Q5: 각 사원에 대해 사원의 이름과 성, 그리고 직속 상사의 이름과 성을 검색하라.
+Q6: 사원 ‘Franklin Wong’이 직접 관리하는 사원의 성과 이름을 검색하라.
+Q7: 사원의 Ssn과 부서의 Dname에 대한 모든 조합을 생성하라.
+Q8: 일반 직원이든 혹은 프로젝트를 담당하는 부서의 관리자이든 간에, 성이 ‘Smith’인 사원을 포함하는 모든 프로젝트에 대해서 프로젝트 번호의 리스트를 검색하라.
+Q9: 주소가 ‘Houston, TX’인 모든 사원의 이름과 성을 검색하라.
+Q10: ‘ProductX’ 프로젝트에 참여하는 모든 사원의 급여를 10% 올린 경우의 급여를 구하라.
+Q11: 모든 부서 이름, 부서에 소속한 사원의 성과 이름, 그리고 각 사원이 진행하는 프로젝트 이름의 리스트를 검색하라. 단, 부서 이름은 내림차순 순서대로, 그리고 각 부서 내에서 사원의 성과 이름은 오름차순대로 구하라.
+Q12: 5번 부서에 근무하는 사원 중에서 ProjectX 프로젝트에 주당 10시간 이상 일하는 모든 사원의 성과 이름을 검색하라.
+Q13: 배우자가 있는 사원들의 수를 검색하라.
+Q14: 각 부서에 대해, 부서의 위치와 다른 곳에서 진행되는 프로젝트의 이름을 부서 이름과 함께 중복된 결과 없이 검색하라.
+
+-----------------------------------------------------------------------------------------------
+
+1.	select Bdate, Address from employee where Fname='John' and Lname='Smith'; 
+
+2.	select * from employee where dno='5';
+ 
+
+3.	select Fname, Lname, Address from employee inner join department on department.Dnumber=employee.Dno where department.Dname = 'Research';
+ 
+
+4.	select project.Pnumber, project.Dnum, employee.Fname, employee.Address, employee.Bdate from project, employee where project.Plocation = "Stafford" and project.Dnum = employee.Dno;
+ 
+
+5. select s.fname, s.lname, e.fname, e.lname 
+from employee e, employee s
+where s.Super_ssn=e.ssn;
+ 
+6. select e.fname, e.lname 
+from employee e, (
+	select ssn from employee where fname='Franklin') s
+where s.ssn=e.Super_ssn;
+ 
+7. select employee.ssn, department.dname from employee, department where employee.Dno=department.Dnumber;
+ 
+
+
+8. select project.Pnumber
+from employee, project
+where employee.Dno = project.Dnum
+	and employee.Lname = "Smith";
+ 
+9. select fname, Lname from employee where Address like "%, Houston, TX";
+ 
+10. select salary*1.1 as Salary
+from employee, project, works_on
+where project.Pname='ProductX'
+	and project.Pnumber=works_on.Pno
+    and employee.ssn = works_on.Essn;
+ 
+11. select department.Dname, employee.Fname, employee.Lname, project.Pname 
+from department, employee, project, works_on
+where department.Dnumber=project.Dnum
+	and project.Pnumber=works_on.pno
+    and works_on.Essn = employee.ssn
+order by department.Dname desc, employee.Fname, employee.Lname asc;
+ 
+12. select distinct employee.Fname, employee.Lname
+from employee, works_on, project
+where works_on.Hours>=10 and employee.Dno=5 
+	and project.pname='ProductX' and project.Pnumber=works_on.Pno;
+ 
+13. select count(*) from dependent where dependent.Relationship='spouse';
+ 
+14. select distinct project.pname, department.dname
+from project, department, dept_locations
+where dept_locations.dlocation != project.plocation
+	and project.Dnum = dept_locations.Dnumber
+	and department.Dnumber = project.Dnum;
+ 
